@@ -90,7 +90,7 @@ model Auction {
 
 model Bid {
   id          String   @id @default(cuid())
-  amount      Float    
+  maxAmount   Float    
   createdAt   DateTime @default(now())
   
   auction     Auction  @relation(fields: [auctionId], references: [id])
