@@ -1,0 +1,121 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AuctionStatus {
+  DRAFT     
+  ACTIVE    
+  ENDED     
+  SOLD      
+  CANCELLED 
+}
+
+enum TransactionStatus {
+  PENDING_PAYMENT  
+  IN_ESCROW        
+  SHIPPED          
+  COMPLETED       
+  REFUNDED        
+}
+
+
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String
+  name           String?
+  role           Role      @default(USER)
+  createdAt      DateTime  @default(now())
+  
+  itemsListed    Item[]       
+  bidsPlaced     Bid[]         
+  auctionsWon    Auction[]     @relation("Winner")
+  transactionsAsBuyer  Transaction[] @relation("Buyer")
+  transactionsAsSeller Transaction[] @relation("Seller")
+}
+
+model Item {
+  id           String    @id @default(cuid())
+  title        String
+  description  String
+  images       Image[]  
+  owner        User   @relation(fields: [ownerId], references: [id])
+  ownerId      String
+  
+  auctions     Auction[] 
+}
+
+model Image {
+  id     String @id @default(cuid())
+  url    String // La URL del archivo subido
+
+  // Relación: Muchas imágenes pertenecen a un Item
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+
+  @@index([itemId])
+}
+
+model Auction {
+  id             String    @id @default(cuid())
+  startTime      DateTime
+  endTime        DateTime  
+  startPrice     Float
+  reservePrice   Float?    
+  buyNowPrice    Float?    
+  
+  status         AuctionStatus @default(DRAFT)
+  
+  currentPrice   Float     @default(0) 
+  highestBidder  User?     @relation("Winner", fields: [highestBidderId], references: [id])
+  highestBidderId String?
+  
+  item           Item      @relation(fields: [itemId], references: [id])
+  itemId         String
+  
+  bids           Bid[]     
+  transaction    Transaction? 
+}
+
+model Bid {
+  id          String   @id @default(cuid())
+  amount      Float    
+  createdAt   DateTime @default(now())
+  
+  auction     Auction  @relation(fields: [auctionId], references: [id])
+  auctionId   String
+  
+  bidder      User     @relation(fields: [bidderId], references: [id])
+  bidderId    String
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  amount      Float    
+  status      TransactionStatus @default(PENDING_PAYMENT)
+  
+  paymentGatewayId String? 
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  auction     Auction     @relation(fields: [auctionId], references: [id], onDelete: NoAction)
+  auctionId   String      @unique 
+  
+  buyer       User        @relation("Buyer", fields: [buyerId], references: [id])
+  buyerId     String
+  
+  seller      User        @relation("Seller", fields: [sellerId], references: [id])
+  sellerId    String
+}
