@@ -8,12 +8,12 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    UsersModule, // Para acceder a UsersService
+    UsersModule,
     PassportModule,
     JwtModule.registerAsync({
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '7d' }, // Token expira en 1 día
+        signOptions: { expiresIn: '7d' }, // Token expira en 7 día
       }),
     }),
   ],
