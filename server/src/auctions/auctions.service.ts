@@ -1,7 +1,8 @@
-import {Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
+import {Injectable, NotFoundException, ForbiddenException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { AuctionStatus } from '@prisma/client';
+import { UpdateAuctionStatusDto } from './dto/update-auction-status.dto';
 
 @Injectable()
 export class AuctionsService {
@@ -65,5 +66,59 @@ export class AuctionsService {
     });
 
     return newAuction;
+  }
+
+  /**
+   * Actualiza el estado de una subasta (ej. DRAFT -> ACTIVE).
+   * @param auctionId El ID de la subasta a actualizar.
+   * @param userId El ID del usuario que realiza la solicitud.
+   * @param newStatus El nuevo estado deseado.
+   */
+  async updateAuctionStatus(
+    auctionId: string,
+    userId: string,
+    newStatus: AuctionStatus,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const auction = await tx.auction.findUnique({
+        where: { id: auctionId },
+        include: {
+          item: {
+            select: { ownerId: true },
+          },
+        },
+      });
+
+      if (!auction) {
+        throw new NotFoundException(`Auction with ID "${auctionId}" not found.`);
+      }
+
+      if (auction.item.ownerId !== userId) {
+        throw new ForbiddenException(
+          'You are not authorized to modify this auction.',
+        );
+      }
+
+      // Solo permite "publicar" (DRAFT -> ACTIVE) o "cancelar" (DRAFT -> CANCELLED)
+      if (auction.status !== AuctionStatus.DRAFT) {
+        throw new BadRequestException(
+          `Auction can only be updated from DRAFT status. Current status: ${auction.status}`,
+        );
+      }
+
+      if (newStatus !== AuctionStatus.ACTIVE && newStatus !== AuctionStatus.CANCELLED) {
+        throw new BadRequestException(
+          `From DRAFT, status can only be updated to ACTIVE or CANCELLED.`,
+        );
+      }
+
+      // 5. Realizar la actualización
+      return tx.auction.update({
+        where: { id: auctionId },
+        data: {
+          status: newStatus,
+        },
+      });
+    });
   }
 }
