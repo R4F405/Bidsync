@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { AuctionStatus } from '@prisma/client';
@@ -31,10 +31,24 @@ export class AuctionsService {
         'You are not authorized to create an auction for this item.',
       );
     }
-    
-    // Verificar que el artículo no esté ya en una subasta activa
 
-    // 4. Crear la subasta
+    // Verificar que este artículo no esté ya en una subasta DRAFT o ACTIVE
+    const existingAuction = await this.prisma.auction.findFirst({
+      where: {
+        itemId: itemId,
+        status: {
+          in: [AuctionStatus.DRAFT, AuctionStatus.ACTIVE],
+        },
+      },
+    });
+
+    if (existingAuction) {
+      throw new ConflictException(
+        'This item is already in a DRAFT or ACTIVE auction.',
+      );
+    }
+
+    // Crear la subasta
     // El estado por defecto es DRAFT
     // Establecemos el currentPrice inicial al startPrice.
     const newAuction = await this.prisma.auction.create({
