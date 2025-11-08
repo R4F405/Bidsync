@@ -1,34 +1,30 @@
-# Cliente de Bidsync
+<h1 align="center">Bidsync Cliente (Frontend)</h1>
 
-Esta es la aplicación cliente de Bidsync, desarrollada con React, TypeScript y Vite.
+Esta es la aplicación cliente (frontend) de Bidsync, responsable de la interfaz de usuario.
 
-## Configuración del proyecto
+Consume la **API del Servidor Bidsync** (ubicada en el directorio `/server`) para obtener datos, gestionar la autenticación y enviar pujas en tiempo real.
 
-1. Instala las dependencias:
+## Stack Tecnológico
 
-   ```bash
-   npm install
-   ```
+* **Framework**: React 19
+* **Lenguaje**: TypeScript
+* **Build Tool**: Vite
+* **Peticiones HTTP**: Axios
 
-2. Inicia el servidor de desarrollo:
+## Configuración del Proyecto
 
-   ```bash
-   npm run dev
-   ```
+1.  Navega al directorio del cliente:
+    ```bash
+    cd client
+    ```
+2.  Instala las dependencias:
+    ```bash
+    npm install
+    ```
 
-3. Abre la aplicación en tu navegador en [http://localhost:5173](http://localhost:5173).
+## Scripts Disponibles
 
-## Scripts disponibles
-
-- `npm run dev`: Inicia el servidor de desarrollo.
-- `npm run build`: Genera una versión de producción.
-- `npm run preview`: Previsualiza la versión de producción.
-
-## Estructura del proyecto
-
-```
-client/
-├── src/       # Código fuente principal
-├── public/    # Archivos estáticos
-└── vite.config.ts  # Configuración de Vite
-```
+* `npm run dev`: Inicia el servidor de desarrollo de Vite (disponible en `http://localhost:5173`).
+* `npm run build`: Genera una versión de producción optimizada en el directorio `dist`.
+* `npm run preview`: Previsualiza la versión de producción localmente.
+* `npm run lint`: Ejecuta el linter de ESLint.

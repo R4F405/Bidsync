@@ -1,70 +1,51 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+<h1 align="center">Bidsync API (Servidor)</h1>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este directorio contiene el servidor API para la plataforma Bidsync, construido con **NestJS**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+ sta API sigue un patrón de **Monolito Modular**  y es responsable de gestionar toda la lógica de negocio, la autenticación de usuarios, el procesamiento de pujas en tiempo real y la persistencia de datos con PostgreSQL a través de Prisma.
 
-# Servidor de Bidsync
+## Módulos Principales
 
-Este es el servidor de Bidsync, construido con el framework NestJS.
+La arquitectura se divide en los siguientes dominios de negocio:
 
-## Configuración del proyecto
+* `AppModule` (Raíz)
+* `PrismaModule` (Gestión de conexión a BD)
+* `AuthModule` (Autenticación y JWT)
+* `UsersModule` (Gestión de usuarios)
+* `ItemsModule` (Gestión de artículos)
+* `AuctionsModule` (Gestión de subastas)
+* `BidsModule` (Gestión de pujas y Proxy Bidding)
+* `TransactionsModule` (Gestión de pagos y Escrow)
 
-1. Instala las dependencias:
-   ```bash
-   npm install
-   ```
+## Configuración y Puesta en Marcha
 
-2. Configura las variables de entorno necesarias en un archivo `.env`.
+1.  **Instalar dependencias**
+    ```bash
+    npm install
+    ```
 
-3. Inicia el servidor en modo desarrollo:
-   ```bash
-   npm run start:dev
-   ```
+2.  **Configurar variables de entorno**
+    Crea un archivo `.env` basándote en el `.env.example`. Deberás proporcionar:
+    * `DATABASE_URL`: Cadena de conexión a tu base de datos PostgreSQL.
+    * `JWT_SECRET`: Clave secreta para firmar los JSON Web Tokens.
 
-## Scripts disponibles
+3.  **Ejecutar migraciones de la Base de Datos**
+    Prisma gestionará el esquema de la base de datos. Ejecuta el siguiente comando para crear las tablas definidas en `prisma/schema.prisma`:
+    ```bash
+    npx prisma migrate dev
+    ```
 
-- `npm run start`: Inicia el servidor en modo producción.
-- `npm run start:dev`: Inicia el servidor en modo desarrollo con recarga automática.
-- `npm run test`: Ejecuta las pruebas unitarias.
-- `npm run test:e2e`: Ejecuta las pruebas end-to-end.
-- `npm run test:cov`: Genera el reporte de cobertura de pruebas.
+4.  **Iniciar el servidor de desarrollo**
+    ```bash
+    npm run start:dev
+    ```
+    La API se ejecutará en `http://localhost:3000` (o el puerto especificado en `.env`).
 
-## Estructura del proyecto
+## Scripts Disponibles
 
-```
-server/
-├── src/       # Código fuente principal
-├── prisma/    # Configuración de Prisma y migraciones
-└── test/      # Pruebas end-to-end
-```
-
-## Ejecuta tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
+* `npm run start:dev`: Inicia el servidor en modo desarrollo con recarga automática.
+* `npm run start:prod`: Inicia el servidor en modo producción (requiere `npm run build` previo).
+* `npm run build`: Compila el proyecto TypeScript a JavaScript.
+* `npm run test`: Ejecuta las pruebas unitarias.
+* `npm run test:e2e`: Ejecuta las pruebas end-to-end.
+* `npm run test:cov`: Genera el reporte de cobertura de pruebas.
