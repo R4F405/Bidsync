@@ -172,12 +172,12 @@ export class AuctionsService {
           let finalStatus: AuctionStatus;
 
           // Determinar el estado final
-          const hasWinner = !!auction.highestBidderId;
           const reserveMet =
             !auction.reservePrice ||
             auction.currentPrice >= auction.reservePrice;
 
-          if (hasWinner && reserveMet) {
+          // Comprobamos si hay un ganador (highestBidderId no es nulo) Y si se cumplió la reserva.
+          if (auction.highestBidderId && reserveMet) {
             // VENDIDO: Hay ganador y el precio de reserva se cumplió
             finalStatus = AuctionStatus.SOLD;
             this.logger.log(
@@ -195,7 +195,7 @@ export class AuctionsService {
             // FINALIZADO: No hubo pujas o no se alcanzó la reserva
             finalStatus = AuctionStatus.ENDED;
             this.logger.log(
-              `Subasta ${auction.id} marcada como ENDED. (Ganador: ${hasWinner}, Reserva Cumplida: ${reserveMet})`,
+              `Subasta ${auction.id} marcada como ENDED. (Ganador: ${!!auction.highestBidderId}, Reserva Cumplida: ${reserveMet})`,
             );
           }
 

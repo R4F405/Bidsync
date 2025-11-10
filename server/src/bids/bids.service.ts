@@ -55,6 +55,12 @@ export class BidsService {
           select: { ownerId: true },
         });
 
+        if (!item) {
+          throw new NotFoundException(
+            `Item associated with auction ${auctionId} not found.`,
+          );
+        }
+
         // Ejecutamos la validación DESPUÉS de obtener el bloqueo.
         // Esto previene que validemos datos "antiguos" (ej. un estado, precio o
         // endTime que estén a punto de ser modificados por otra transacción).

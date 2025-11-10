@@ -25,10 +25,7 @@ export class TransactionsService {
    * @param buyerId El ID del comprador (highestBidderId).
    */
   async createTransactionForSoldAuction(
-    tx: Omit<
-      PrismaService,
-      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
-    >,
+    tx: Prisma.TransactionClient,
     auction: { id: string; currentPrice: number },
     itemOwnerId: string,
     buyerId: string,
