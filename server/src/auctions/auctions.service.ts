@@ -3,10 +3,21 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { AuctionStatus } from '@prisma/client';
 import { UpdateAuctionStatusDto } from './dto/update-auction-status.dto';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { Logger } from '@nestjs/common';
+import { TransactionsService } from '../transactions/transactions.service';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class AuctionsService {
-  constructor(private prisma: PrismaService) {}
+
+  private readonly logger = new Logger(AuctionsService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private transactionsService: TransactionsService,
+    private eventsGateway: EventsGateway,
+  ) {}
 
   /**
    * Crea una nueva subasta para un artículo.
@@ -120,5 +131,94 @@ export class AuctionsService {
         },
       });
     });
+  }
+
+  /**
+   * Tarea programada para finalizar subastas.
+   * Se ejecuta cada 30 segundos.
+   */
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async handleAuctionEndScheduler() {
+    this.logger.log('Ejecutando el programador de finalización de subastas...');
+
+    const now = new Date();
+
+    // Buscar subastas que han expirado
+    const expiredAuctions = await this.prisma.auction.findMany({
+      where: {
+        status: AuctionStatus.ACTIVE,
+        endTime: {
+          lte: now,
+        },
+      },
+      include: {
+        item: {
+          select: { ownerId: true },
+        },
+      },
+    });
+
+    if (expiredAuctions.length === 0) {
+      this.logger.log('No hay subastas expiradas para procesar.');
+      return;
+    }
+
+    this.logger.log(`Se encontraron ${expiredAuctions.length} subastas para procesar.`);
+
+    // Procesar cada subasta
+    for (const auction of expiredAuctions) {
+      try {
+        await this.prisma.$transaction(async (tx) => {
+          let finalStatus: AuctionStatus;
+
+          // Determinar el estado final
+          const hasWinner = !!auction.highestBidderId;
+          const reserveMet =
+            !auction.reservePrice ||
+            auction.currentPrice >= auction.reservePrice;
+
+          if (hasWinner && reserveMet) {
+            // VENDIDO: Hay ganador y el precio de reserva se cumplió
+            finalStatus = AuctionStatus.SOLD;
+            this.logger.log(
+              `Subasta ${auction.id} marcada como SOLD. Precio final: ${auction.currentPrice}.`,
+            );
+
+            // Crear la transacción
+            await this.transactionsService.createTransactionForSoldAuction(
+              tx,
+              auction,
+              auction.item.ownerId,
+              auction.highestBidderId,
+            );
+          } else {
+            // FINALIZADO: No hubo pujas o no se alcanzó la reserva
+            finalStatus = AuctionStatus.ENDED;
+            this.logger.log(
+              `Subasta ${auction.id} marcada como ENDED. (Ganador: ${hasWinner}, Reserva Cumplida: ${reserveMet})`,
+            );
+          }
+
+          // Actualizar la subasta
+          await tx.auction.update({
+            where: { id: auction.id },
+            data: {
+              status: finalStatus,
+            },
+          });
+
+          // Notificar a los clientes vía WebSocket
+          this.eventsGateway.emitAuctionUpdate(auction.id, {
+            status: finalStatus,
+            currentPrice: auction.currentPrice,
+            highestBidderId: auction.highestBidderId,
+          });
+        });
+      } catch (error) {
+        this.logger.error(
+          `Error procesando la subasta ${auction.id}: ${error.message}`,
+        );
+      }
+    }
   }
 }
