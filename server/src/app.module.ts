@@ -10,10 +10,28 @@ import { AuctionsModule } from './auctions/auctions.module';
 import { BidsModule } from './bids/bids.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { EventsModule } from './events/events.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), PrismaModule, AuthModule, UsersModule, ItemsModule, AuctionsModule, BidsModule, TransactionsModule, EventsModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    ItemsModule,
+    AuctionsModule,
+    BidsModule,
+    TransactionsModule,
+    EventsModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}
