@@ -8,9 +8,10 @@ import { ItemsModule } from './items/items.module';
 import { AuctionsModule } from './auctions/auctions.module';
 import { BidsModule } from './bids/bids.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, ItemsModule, AuctionsModule, BidsModule, TransactionsModule],
+  imports: [PrismaModule, AuthModule, UsersModule, ItemsModule, AuctionsModule, BidsModule, TransactionsModule, EventsModule],
   controllers: [AppController],
   providers: [AppService],
 })
