@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// La URL base de nuestra API NestJS
-const API_URL = process.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -9,5 +8,19 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Interceptor para añadir el token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 export default apiClient;
