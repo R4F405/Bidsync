@@ -16,8 +16,6 @@
 
 Bidsync es una plataforma de subastas en tiempo real diseñada para ser eficiente, escalable y robusta. Este repositorio contiene la implementación completa del proyecto, separada en un backend de API (servidor) y una aplicación web (cliente).
 
- Este proyecto se basa en el **Documento de Definición del Proyecto (v1.0)**.
-
 ## Arquitectura
 
 El sistema sigue un enfoque de **Monolito Modular** para el backend, construido con NestJS , lo que permite una alta cohesión y bajo acoplamiento entre los dominios de negocio (usuarios, subastas, pujas, etc.)
