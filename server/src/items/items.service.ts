@@ -1,4 +1,7 @@
-import { Injectable,NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateItemDto } from './dto/create-item.dto';
 
@@ -7,10 +10,29 @@ export class ItemsService {
   constructor(private prisma: PrismaService) {}
 
   /**
+   * Busca un artículo por su ID.
+   * @param itemId El ID del artículo.
+   * @returns El artículo.
+   */
+  async findItemById(itemId: string) {
+    const item = await this.prisma.item.findUnique({
+      where: { id: itemId },
+      include: {
+        images: true, // Incluimos las imágenes
+      },
+    });
+
+    if (!item) {
+      throw new NotFoundException(`Item with ID "${itemId}" not found`);
+    }
+    return item;
+  }
+
+  /**
    * Crea un nuevo artículo y sus imágenes asociadas.
    * @param ownerId El ID del usuario autenticado (dueño)
    * @param createItemDto Los datos del artículo (título, descripción)
-   * @param images Un array de URLs generadas localmente por Multer
+   * @param imageUrls Un array de URLs generadas localmente por Multer
    * @returns El artículo creado con sus imágenes.
    */
   async createItem(
@@ -52,24 +74,5 @@ export class ItemsService {
     });
 
     return newItem;
-  }
-
-  /**
-   * Busca un artículo por su ID.
-   * @param itemId El ID del artículo.
-   * @returns El artículo.
-   */
-  async findItemById(itemId: string) {
-    const item = await this.prisma.item.findUnique({
-      where: { id: itemId },
-      include: {
-        images: true, // Incluimos las imágenes
-      },
-    });
-
-    if (!item) {
-      throw new NotFoundException(`Item with ID "${itemId}" not found`);
-    }
-    return item;
   }
 }

@@ -1,6 +1,6 @@
 import apiClient from './apiClient';
 
-// Este DTO ahora solo es para la entrada de texto
+// Tipos basados en los DTOs del backend
 interface CreateItemTextDto {
   title: string;
   description: string;
@@ -15,7 +15,6 @@ interface Item {
 }
 
 export const itemService = {
-
   /**
    * Llama al endpoint GET /items/:id para obtener los detalles de un artículo.
    */
@@ -33,19 +32,18 @@ export const itemService = {
     files: FileList,
   ): Promise<Item> => {
     
-    // Crear el objeto FormData
+    // 1. Crear el objeto FormData
     const formData = new FormData();
     formData.append('title', textData.title);
     formData.append('description', textData.description);
 
-    // Adjuntar todos los archivos
+    // 2. Adjuntar todos los archivos
     // El 'images' debe coincidir con el FilesInterceptor del backend
     Array.from(files).forEach((file) => {
       formData.append('images', file);
     });
 
     // 3. Enviar la petición.
-    // DEBEMOS sobreescribir el 'Content-Type' header que pone apiClient para que el navegador lo ponga automáticamente como 'multipart/form-data' junto con el 'boundary' correcto.
     const response = await apiClient.post<Item>('/items', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',

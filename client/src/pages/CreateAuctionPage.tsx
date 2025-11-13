@@ -96,7 +96,7 @@ export const CreateAuctionPage = () => {
     return (
       <div>
         <h1>Subasta Creada en Borrador</h1>
-        <p>Tu subasta para el artículo {newAuction.itemId} ha sido creada con el ID: {newAuction.id}.</p>
+        <p>Tu subasta para el artículo {itemTitle} ha sido creada .</p>
         <p>Estado actual: <strong>{newAuction.status}</strong></p>
         <p>Ahora puedes publicarla para que los usuarios puedan pujar.</p>
         {error && <p style={{ color: 'red' }}>{error}</p>}
