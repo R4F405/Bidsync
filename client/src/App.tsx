@@ -12,12 +12,16 @@ function App() {
         
         {isAuthenticated ? (
           <>
-            <span>Hola, {user?.email}</span>
+            <Link to="/items/new" style={{ marginLeft: 'auto', color: '#87CEEB' }}>
+              + Vender Artículo
+            </Link>
+            
+            <span style={{ marginLeft: 'auto' }}>Hola, {user?.email}</span>
             <button onClick={logout}>Logout</button>
           </>
         ) : (
           <>
-            <Link to="/login">Login</Link>
+            <Link to="/login" style={{ marginLeft: 'auto' }}>Login</Link>
             <Link to="/register">Register</Link>
           </>
         )}

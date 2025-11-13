@@ -17,12 +17,4 @@ export class CreateItemDto {
   @IsNotEmpty()
   @MinLength(10)
   description: string;
-
-  @IsArray()
-  @IsOptional()
-  @IsUrl(
-    {},
-    { each: true, message: 'Each image must be a valid URL string' },
-  )
-  images?: string[];
 }

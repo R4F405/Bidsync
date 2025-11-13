@@ -3,6 +3,9 @@ import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
 import App from '../App';
+import { ProtectedRoute } from './ProtectedRoute';
+import { CreateItemPage } from '../pages/CreateItemPage';
+import { CreateAuctionPage } from '../pages/CreateAuctionPage';
 
 const router = createBrowserRouter([
   {
@@ -20,6 +23,19 @@ const router = createBrowserRouter([
       {
         path: '/register',
         element: <RegisterPage />,
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: '/items/new',
+            element: <CreateItemPage />,
+          },
+          {
+            path: '/auctions/new/:itemId',
+            element: <CreateAuctionPage />,
+          },
+        ],
       },
     ],
   },
