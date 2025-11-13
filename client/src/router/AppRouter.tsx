@@ -1,22 +1,25 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
+import { RegisterPage } from '../pages/RegisterPage';
 import App from '../App';
 
-// Usamos el nuevo sistema de enrutamiento basado en objetos
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />, // App.tsx será el layout raíz
+    element: <App />,
     children: [
-      // Rutas que se renderizarán dentro del <Outlet /> de App.tsx
       {
-        index: true, // Ruta hija por defecto (path: '/')
+        index: true,
         element: <HomePage />,
       },
       {
         path: '/login',
         element: <LoginPage />,
+      },
+      {
+        path: '/register',
+        element: <RegisterPage />,
       },
     ],
   },

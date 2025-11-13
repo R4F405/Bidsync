@@ -1,20 +1,28 @@
 import { Outlet, Link } from 'react-router-dom';
 import './App.css';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  const { isAuthenticated, user, logout } = useAuth();
+
   return (
     <>
-      {/* Barra de Navegación Simple */}
-      <nav style={{ padding: '1rem', background: '#333' }}>
-        <Link to="/" style={{ marginRight: '1rem' }}>
-          Bidsync
-        </Link>
-        <Link to="/login" style={{ marginRight: '1rem' }}>
-          Login
-        </Link>
+      <nav style={{ padding: '1rem', background: '#333', display: 'flex', gap: '1rem' }}>
+        <Link to="/">Bidsync</Link>
+        
+        {isAuthenticated ? (
+          <>
+            <span>Hola, {user?.email}</span>
+            <button onClick={logout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <Link to="/login">Login</Link>
+            <Link to="/register">Register</Link>
+          </>
+        )}
       </nav>
 
-      {/* Contenido Principal */}
       <main style={{ padding: '1rem' }}>
         <Outlet />
       </main>
