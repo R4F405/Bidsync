@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request, Patch, Param } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Patch, Param, Get } from '@nestjs/common';
 import { AuctionsService } from './auctions.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateAuctionDto } from './dto/create-auction.dto';
@@ -7,6 +7,22 @@ import { UpdateAuctionStatusDto } from './dto/update-auction-status.dto';
 @Controller('auctions')
 export class AuctionsController {
   constructor(private readonly auctionsService: AuctionsService) {}
+
+  /**
+   * Endpoint público para obtener todas las subastas ACTIVAS.
+   */
+  @Get()
+  async findActiveAuctions() {
+    return this.auctionsService.getActiveAuctions();
+  }
+
+  /**
+   * Endpoint público para obtener una subasta por su ID.
+   */
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.auctionsService.getAuctionById(id);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post()

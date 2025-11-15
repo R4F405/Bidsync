@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Get, Param } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateBidDto } from './dto/create-bid.dto';
@@ -15,5 +15,19 @@ export class BidsController {
   ) {
     const userId = req.user.userId;
     return this.bidsService.placeBid(userId, createBidDto);
+  }
+
+  /**
+   * Endpoint protegido para que un usuario consulte su
+   * puja máxima actual en una subasta.
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get('my-bid/:auctionId')
+  async getMyMaxBid(
+    @Request() req,
+    @Param('auctionId') auctionId: string,
+  ) {
+    const userId = req.user.userId;
+    return this.bidsService.findUserMaxBid(userId, auctionId);
   }
 }
