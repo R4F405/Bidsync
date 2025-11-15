@@ -12,6 +12,7 @@
   </a>
   <img src="https://img.shields.io/badge/ORM-Prisma-2D3748.svg?logo=prisma&logoColor=white" alt="ORM: Prisma" />
   <img src="https://img.shields.io/badge/Database-PostgreSQL-4169E1.svg?logo=postgresql&logoColor=white" alt="Database: PostgreSQL" >
+  <a href="https://deepwiki.com/R4F405/Bidsync"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </p>
 
 Bidsync es una plataforma de subastas en tiempo real diseñada para ser eficiente, escalable y robusta. Este repositorio contiene la implementación completa del proyecto, separada en un backend de API (servidor) y una aplicación web (cliente).
