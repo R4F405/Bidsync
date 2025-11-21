@@ -1,3 +1,6 @@
+#Personalizado para el cliente Bidsync
+.env
+
 # Logs
 logs
 *.log

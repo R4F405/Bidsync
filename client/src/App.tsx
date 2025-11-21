@@ -9,13 +9,16 @@ function App() {
     <>
       <nav style={{ padding: '1rem', background: '#333', display: 'flex', gap: '1rem' }}>
         <Link to="/">Bidsync</Link>
-        
+
         {isAuthenticated ? (
           <>
             <Link to="/items/new" style={{ marginLeft: 'auto', color: '#87CEEB' }}>
               + Vender Artículo
             </Link>
-            
+            <Link to="/dashboard" style={{ marginLeft: '1rem', color: 'white' }}>
+              Dashboard
+            </Link>
+
             <span style={{ marginLeft: 'auto' }}>Hola, {user?.email}</span>
             <button onClick={logout}>Logout</button>
           </>

@@ -87,27 +87,60 @@ export class BidsService {
         let newCurrentPrice = auction.currentPrice;
         let newHighestBidderId = auction.highestBidderId;
 
+        // Es la primera puja
         if (!currentHighestBid) {
-          // Es la primera puja.
           newCurrentPrice = auction.startPrice;
           newHighestBidderId = userId;
-        } else if (maxAmount > currentHighestBid.maxAmount) {
+        } 
+        
+        // El pujador actual YA ES el pujador más alto
+        else if (currentHighestBid.bidderId === userId) {
+          
+          // El usuario está aumentando su puja máxima
+          if (maxAmount > currentHighestBid.maxAmount) {
+            newHighestBidderId = userId;
+            this.logger.log(`Usuario ${userId} aumentó su puja máxima a ${maxAmount}. El precio no cambia.`);
+            // NO CAMBIAMOS newCurrentPrice
+          } 
+          
+          // El usuario puja MENOS que su máximo actual (raro, pero se maneja)
+          else if (maxAmount < currentHighestBid.maxAmount) { 
+            const increment = maxAmount * this.BID_INCREMENT_PERCENTAGE;
+            newCurrentPrice = Math.min(
+              currentHighestBid.maxAmount,
+              maxAmount + increment,
+            );
+            newHighestBidderId = currentHighestBid.bidderId; // Sigue siendo él
+          }
+
+          // El usuario puja EXACTAMENTE su máximo
+          else {
+            this.logger.log(`Usuario ${userId} volvió a pujar su máximo ${maxAmount}. Sin cambios.`);
+            newHighestBidderId = userId; // Nos aseguramos de que sigue siendo el líder
+            // NO CAMBIAMOS newCurrentPrice
+          }
+        }
+        // Es un nuevo pujador o un pujador antiguo superando al líder
+        else if (maxAmount > currentHighestBid.maxAmount) {
           // El nuevo pujador es el líder.
-          const increment =
-            currentHighestBid.maxAmount * this.BID_INCREMENT_PERCENTAGE;
+          // El precio sube a la puja máxima anterior + incremento
+          const increment = currentHighestBid.maxAmount * this.BID_INCREMENT_PERCENTAGE;
           newCurrentPrice = Math.min(
-            maxAmount,
+            maxAmount, // No puede superar el maxAmount del nuevo pujador
             currentHighestBid.maxAmount + increment,
           );
           newHighestBidderId = userId;
-        } else {
+        } 
+        // La puja no es suficiente para ser el líder
+        else {
           // El nuevo pujador NO es el líder.
+          // El precio sube a la puja del nuevo pujador + incremento
           const increment = maxAmount * this.BID_INCREMENT_PERCENTAGE;
           newCurrentPrice = Math.min(
-            currentHighestBid.maxAmount,
+            currentHighestBid.maxAmount, // No puede superar el maxAmount del líder
             maxAmount + increment,
           );
-          newHighestBidderId = currentHighestBid.bidderId;
+          newHighestBidderId = currentHighestBid.bidderId; // El líder se mantiene
         }
 
         // Variables de estado por defecto
@@ -121,7 +154,7 @@ export class BidsService {
           auction.status === AuctionStatus.ACTIVE
         ) {
           this.logger.log(
-            `[BID-8] ¡Buy Now alcanzado! Subasta ${auctionId} vendida.`,
+            `¡Buy Now alcanzado! Subasta ${auctionId} vendida.`,
           );
           newCurrentPrice = auction.buyNowPrice;
           newHighestBidderId = userId; // El pujador que activó el Buy Now gana
@@ -177,6 +210,25 @@ export class BidsService {
         timeout: 10000, 
       },
     );
+  }
+
+  /**
+   * Encuentra la puja máxima actual de un usuario específico para una subasta.
+   * @param userId El ID del usuario que pregunta.
+   * @param auctionId El ID de la subasta en cuestión.
+   * @returns La puja más alta del usuario (o null si no ha pujado).
+   */
+  async findUserMaxBid(userId: string, auctionId: string) {
+    // Buscamos la puja MÁS ALTA (maxAmount) de este usuario en esta subasta específica.
+    return this.prisma.bid.findFirst({
+      where: {
+        bidderId: userId,
+        auctionId: auctionId,
+      },
+      orderBy: {
+        maxAmount: 'desc',
+      },
+    });
   }
 
   /**

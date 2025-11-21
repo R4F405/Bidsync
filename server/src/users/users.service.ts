@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /**
    * Busca un usuario por su email.
@@ -32,6 +32,56 @@ export class UsersService {
       data: {
         ...data,
         passwordHash: hashedPassword,
+      },
+    });
+  }
+
+  /**
+   * Obtiene los items creados por un usuario.
+   */
+  async getUserItems(userId: string) {
+    return this.prisma.item.findMany({
+      where: { ownerId: userId },
+      include: {
+        images: true,
+        auctions: {
+          orderBy: { startTime: 'desc' },
+          take: 1,
+        },
+      },
+    });
+  }
+
+  /**
+   * Obtiene las pujas realizadas por un usuario.
+   */
+  async getUserBids(userId: string) {
+    return this.prisma.bid.findMany({
+      where: { bidderId: userId },
+      include: {
+        auction: {
+          include: {
+            item: {
+              include: { images: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  /**
+   * Obtiene las subastas ganadas por un usuario.
+   */
+  async getUserWonAuctions(userId: string) {
+    return this.prisma.auction.findMany({
+      where: { highestBidderId: userId, status: 'ENDED' }, // Asumiendo que ENDED es el estado final
+      include: {
+        item: {
+          include: { images: true },
+        },
+        transaction: true,
       },
     });
   }

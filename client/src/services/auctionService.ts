@@ -1,4 +1,5 @@
 import apiClient from './apiClient';
+import type { Auction } from '../types/auction';
 
 interface CreateAuctionDto {
   itemId: string;
@@ -9,10 +10,24 @@ interface CreateAuctionDto {
   buyNowPrice?: number;
 }
 
-// Usamos 'any' por ahora para la respuesta, podríamos definir un tipo Auction completo más tarde
-type Auction = any;
-
 export const auctionService = {
+
+  /**
+   * Obtiene la lista de subastas activas.
+   */
+  getActiveAuctions: async (): Promise<Auction[]> => {
+    const response = await apiClient.get<Auction[]>('/auctions');
+    return response.data;
+  },
+
+  /**
+   * Obtiene una subasta por su ID.
+   */
+  getAuctionById: async (id: string): Promise<Auction> => {
+    const response = await apiClient.get<Auction>(`/auctions/${id}`);
+    return response.data;
+  },
+
   /**
    * Llama al endpoint POST /auctions para crear una nueva subasta (en estado DRAFT)
    */

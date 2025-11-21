@@ -80,6 +80,60 @@ export class AuctionsService {
   }
 
   /**
+   * Obtiene todas las subastas que están actualmente ACTIVAS.
+   * Ordena por fecha de finalización (las que terminan antes, primero).
+   */
+  async getActiveAuctions() {
+    this.logger.log('Buscando todas las subastas ACTIVAS...');
+    
+    return this.prisma.auction.findMany({
+      where: {
+        status: AuctionStatus.ACTIVE,
+      },
+      orderBy: {
+        endTime: 'asc', // Mostrar primero las que están por terminar
+      },
+      include: {
+        // Incluimos el item para obtener su título y descripción
+        item: {
+          include: {
+            images: {
+              take: 1, // Solo necesitamos la primera imagen para la tarjeta
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Obtiene una subasta específica por su ID.
+   * Incluye todos los detalles del item y todas sus imágenes.
+   */
+  async getAuctionById(auctionId: string) {
+    this.logger.log(`Buscando subasta con ID: ${auctionId}`);
+    
+    const auction = await this.prisma.auction.findUnique({
+      where: {
+        id: auctionId,
+      },
+      include: {
+        item: {
+          include: {
+            images: true, // Incluir TODAS las imágenes
+          },
+        },
+      },
+    });
+
+    if (!auction) {
+      throw new NotFoundException(`Auction with ID "${auctionId}" not found.`);
+    }
+    
+    return auction;
+  }
+
+  /**
    * Actualiza el estado de una subasta (ej. DRAFT -> ACTIVE).
    * @param auctionId El ID de la subasta a actualizar.
    * @param userId El ID del usuario que realiza la solicitud.
@@ -221,4 +275,6 @@ export class AuctionsService {
       }
     }
   }
+
+
 }
