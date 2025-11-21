@@ -7,6 +7,7 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { CreateItemPage } from '../pages/CreateItemPage';
 import { CreateAuctionPage } from '../pages/CreateAuctionPage';
 import { AuctionDetailPage } from '../pages/AuctionDetailPage';
+import { DashboardPage } from '../pages/DashboardPage';
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
           {
             path: '/auctions/new/:itemId',
             element: <CreateAuctionPage />,
+          },
+          {
+            path: '/dashboard',
+            element: <DashboardPage />,
           },
         ],
       },
