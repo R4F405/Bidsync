@@ -227,6 +227,7 @@ export const AuctionDetailPage = () => {
           )}
 
           <input
+            id="bidAmount"
             type="number"
             value={bidAmount}
             onChange={(e) => {
@@ -240,6 +241,7 @@ export const AuctionDetailPage = () => {
             disabled={isBidding || isOwner || !isAuthenticated}
           />
           <button
+            id="placeBidBtn"
             type="submit"
             disabled={isBidding || isOwner || !isAuthenticated}
           >

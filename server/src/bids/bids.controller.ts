@@ -5,7 +5,7 @@ import { CreateBidDto } from './dto/create-bid.dto';
 
 @Controller('bids')
 export class BidsController {
-  constructor(private readonly bidsService: BidsService) {}
+  constructor(private readonly bidsService: BidsService) { }
 
   @UseGuards(JwtAuthGuard) // Solo usuarios logueados pueden pujar
   @Post()

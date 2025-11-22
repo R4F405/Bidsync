@@ -5,7 +5,15 @@ export interface UserItem {
     title: string;
     description: string;
     images: { url: string }[];
-    auctions: { id: string; status: string; currentPrice: number }[];
+    auctions: {
+        id: string;
+        status: string;
+        currentPrice: number;
+        transaction?: {
+            id: string;
+            status: string;
+        };
+    }[];
 }
 
 export interface UserBid {

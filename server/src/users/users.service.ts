@@ -47,6 +47,7 @@ export class UsersService {
         auctions: {
           orderBy: { startTime: 'desc' },
           take: 1,
+          include: { transaction: true },
         },
       },
     });
