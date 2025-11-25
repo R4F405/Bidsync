@@ -7,7 +7,7 @@ import { CreateItemDto } from './dto/create-item.dto';
 
 @Injectable()
 export class ItemsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /**
    * Busca un artículo por su ID.
@@ -19,6 +19,10 @@ export class ItemsService {
       where: { id: itemId },
       include: {
         images: true, // Incluimos las imágenes
+        auctions: {
+          orderBy: { startTime: 'desc' },
+          take: 1,
+        },
       },
     });
 

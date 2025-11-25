@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getUserItems, getUserBids, getUserWonAuctions } from '../services/userService';
 import type { UserItem, UserBid, WonAuction } from '../services/userService';
 import { payTransaction, shipItem, confirmReceipt } from '../services/transactionService';
@@ -68,8 +69,8 @@ export const DashboardPage = () => {
         <button
             onClick={() => setActiveTab(id)}
             className={`flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm transition-colors ${activeTab === id
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
         >
             {label}
@@ -102,52 +103,97 @@ export const DashboardPage = () => {
                                 items.map(item => {
                                     const soldAuction = item.auctions.find(a => a.status === 'SOLD' || a.status === 'ENDED');
                                     const transaction = soldAuction?.transaction;
+                                    // Check if it's a draft (no auctions OR the latest auction is DRAFT)
+                                    const isDraft = item.auctions.length === 0 || item.auctions[0].status === 'DRAFT';
+
+                                    // Helper to get correct image URL
+                                    const getImageUrl = (url: string) => {
+                                        if (url.startsWith('http')) return url;
+                                        // Remove 'public' from start if present to avoid double public/public
+                                        const cleanPath = url.replace(/^public/, '');
+                                        return `http://localhost:3000${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
+                                    };
 
                                     return (
                                         <div key={item.id} className="bg-white shadow rounded-lg p-6 border border-gray-100">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
-                                                    <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                                            <div className="flex gap-4">
+                                                {/* Image Section */}
+                                                <div className="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
+                                                    {item.images && item.images.length > 0 ? (
+                                                        <img
+                                                            src={getImageUrl(item.images[0].url)}
+                                                            alt={item.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.auctions.length > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                    {item.auctions.length > 0 ? item.auctions[0].status : 'Borrador'}
-                                                </span>
-                                            </div>
 
-                                            {item.auctions.length > 0 && (
-                                                <div className="mt-4 border-t border-gray-100 pt-4">
-                                                    <p className="text-sm text-gray-600">
-                                                        Precio actual: <span className="font-semibold text-gray-900">${item.auctions[0].currentPrice}</span>
-                                                    </p>
+                                                {/* Content Section */}
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
+                                                            <p className="mt-1 text-sm text-gray-500 line-clamp-2">{item.description}</p>
+                                                        </div>
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${!isDraft ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                                            }`}>
+                                                            {!isDraft ? item.auctions[0].status : 'Borrador'}
+                                                        </span>
+                                                    </div>
 
-                                                    {transaction && (
-                                                        <div className="mt-3 bg-gray-50 p-3 rounded-md">
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="text-sm font-medium text-gray-900">Estado Transacción: {transaction.status}</span>
-                                                                {transaction.status === 'IN_ESCROW' && (
-                                                                    <button
-                                                                        onClick={() => handleShip(transaction.id)}
-                                                                        className="ml-3 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                                                    >
-                                                                        Marcar Enviado
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                            {transaction.status === 'PENDING_PAYMENT' && (
-                                                                <p className="mt-1 text-xs text-amber-600">Esperando pago del comprador</p>
-                                                            )}
-                                                            {transaction.status === 'SHIPPED' && (
-                                                                <p className="mt-1 text-xs text-blue-600">Enviado - Esperando confirmación</p>
-                                                            )}
-                                                            {transaction.status === 'COMPLETED' && (
-                                                                <p className="mt-1 text-xs text-green-600">Transacción Finalizada</p>
+                                                    {/* Draft Action */}
+                                                    {isDraft && (
+                                                        <div className="mt-4 flex justify-end">
+                                                            <Link
+                                                                to={`/auctions/new/${item.id}`}
+                                                                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                                            >
+                                                                {item.auctions.length > 0 && item.auctions[0].status === 'DRAFT' ? 'Publicar' : 'Crear Subasta'}
+                                                            </Link>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Auction & Transaction Info */}
+                                                    {!isDraft && (
+                                                        <div className="mt-4 border-t border-gray-100 pt-4">
+                                                            <p className="text-sm text-gray-600">
+                                                                Precio actual: <span className="font-semibold text-gray-900">${item.auctions[0].currentPrice}</span>
+                                                            </p>
+
+                                                            {transaction && (
+                                                                <div className="mt-3 bg-gray-50 p-3 rounded-md">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="text-sm font-medium text-gray-900">Estado Transacción: {transaction.status}</span>
+                                                                        {transaction.status === 'IN_ESCROW' && (
+                                                                            <button
+                                                                                onClick={() => handleShip(transaction.id)}
+                                                                                className="ml-3 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                                            >
+                                                                                Marcar Enviado
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                    {transaction.status === 'PENDING_PAYMENT' && (
+                                                                        <p className="mt-1 text-xs text-amber-600">Esperando pago del comprador</p>
+                                                                    )}
+                                                                    {transaction.status === 'SHIPPED' && (
+                                                                        <p className="mt-1 text-xs text-blue-600">Enviado - Esperando confirmación</p>
+                                                                    )}
+                                                                    {transaction.status === 'COMPLETED' && (
+                                                                        <p className="mt-1 text-xs text-green-600">Transacción Finalizada</p>
+                                                                    )}
+                                                                </div>
                                                             )}
                                                         </div>
                                                     )}
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     );
                                 })

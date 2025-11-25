@@ -38,6 +38,14 @@ export const CreateAuctionPage = () => {
       itemService.getItemById(itemId)
         .then(item => {
           setItemTitle(item.title); // Guardamos el título
+
+          // Check if there is an existing DRAFT auction
+          if (item.auctions && item.auctions.length > 0) {
+            const draftAuction = item.auctions.find((a: any) => a.status === 'DRAFT');
+            if (draftAuction) {
+              setNewAuction(draftAuction);
+            }
+          }
         })
         .catch(err => {
           console.error(err);
@@ -117,8 +125,8 @@ export const CreateAuctionPage = () => {
             onClick={handlePublishAuction}
             disabled={isLoading}
             className={`w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-white transition-all ${isLoading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-primary hover:bg-opacity-90 shadow-md hover:shadow-lg transform active:scale-95'
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-primary hover:bg-opacity-90 shadow-md hover:shadow-lg transform active:scale-95'
               }`}
           >
             {isLoading ? 'Publicando...' : 'Publicar Subasta Ahora'}
@@ -244,8 +252,8 @@ export const CreateAuctionPage = () => {
             type="submit"
             disabled={isLoading}
             className={`w-full py-3 rounded-lg font-bold text-white transition-all ${isLoading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-primary hover:bg-opacity-90 shadow-md hover:shadow-lg transform active:scale-95'
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-primary hover:bg-opacity-90 shadow-md hover:shadow-lg transform active:scale-95'
               }`}
           >
             {isLoading ? 'Guardando...' : 'Guardar Borrador'}
