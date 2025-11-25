@@ -1,4 +1,5 @@
-import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { authService } from '../services/authService';
 import type { UserProfile } from '../types/user';
 
@@ -62,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Función de Login
   const login = async (token: string) => {
     localStorage.setItem('authToken', token);
-    
+
     try {
       // Obtenemos el perfil real inmediatamente después de guardar el token
       const userProfile = await authService.getProfile();
