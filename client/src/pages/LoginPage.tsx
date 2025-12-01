@@ -19,13 +19,13 @@ export const LoginPage = () => {
     try {
       const { access_token } = await authService.login({ email, password });
       await login(access_token);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');
       console.error(err);
     } finally {
       setIsLoading(false);
-    }
+    };
   };
 
   return (
