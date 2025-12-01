@@ -6,12 +6,19 @@ interface CreateItemTextDto {
   description: string;
 }
 
-interface Item {
+export interface Item {
   id: string;
   title: string;
   description: string;
   ownerId: string;
   images: { id: string; url: string }[];
+  auctions?: {
+    id: string;
+    status: string;
+    currentPrice: number;
+    startTime: string;
+    endTime: string;
+  }[];
 }
 
 export const itemService = {
@@ -31,7 +38,7 @@ export const itemService = {
     textData: CreateItemTextDto,
     files: FileList,
   ): Promise<Item> => {
-    
+
     // 1. Crear el objeto FormData
     const formData = new FormData();
     formData.append('title', textData.title);
@@ -49,7 +56,7 @@ export const itemService = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    
+
     return response.data;
   },
 };

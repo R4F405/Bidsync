@@ -5,7 +5,7 @@ description: Rules for Bidsync project (React/Vite + NestJS)
 
 # Bidsync Project Rules
 
-## 6. Language
+## Language
 - Use Spanish for all responses and plans.
 - Use English for all code comments and documentation.
 

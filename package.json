@@ -1,0 +1,19 @@
+{
+  "name": "bidsync",
+  "version": "1.0.0",
+  "description": "Bidsync - Auction platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run start:dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "lint": "concurrently \"npm run lint:client\" \"npm run lint:server\"",
+    "lint:client": "cd client && npm run lint",
+    "lint:server": "cd server && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

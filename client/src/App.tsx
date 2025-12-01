@@ -1,39 +1,15 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import './App.css';
-import { useAuth } from './context/AuthContext';
+import Navbar from './components/Navbar';
 
 function App() {
-  const { isAuthenticated, user, logout } = useAuth();
-
   return (
-    <>
-      <nav style={{ padding: '1rem', background: '#333', display: 'flex', gap: '1rem' }}>
-        <Link to="/">Bidsync</Link>
-
-        {isAuthenticated ? (
-          <>
-            <Link to="/items/new" style={{ marginLeft: 'auto', color: '#87CEEB' }}>
-              + Vender Artículo
-            </Link>
-            <Link to="/dashboard" style={{ marginLeft: '1rem', color: 'white' }}>
-              Dashboard
-            </Link>
-
-            <span style={{ marginLeft: 'auto' }}>Hola, {user?.email}</span>
-            <button onClick={logout}>Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" style={{ marginLeft: 'auto' }}>Login</Link>
-            <Link to="/register">Register</Link>
-          </>
-        )}
-      </nav>
-
-      <main style={{ padding: '1rem' }}>
+    <div className="min-h-screen bg-background font-sans text-secondary">
+      <Navbar />
+      <main className="w-full px-4 py-8">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }
 

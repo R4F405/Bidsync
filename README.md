@@ -6,6 +6,7 @@
   </a>
   <img src="https://img.shields.io/badge/Built%20with-TypeScript-blue.svg?logo=typescript&logoColor=white" alt="Built with: TypeScript" />
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB.svg?logo=react&logoColor=black" alt="Frontend: React" />
+  <img src="https://img.shields.io/badge/Style-Tailwind_CSS-38B2AC.svg?logo=tailwind-css&logoColor=white" alt="Style: Tailwind CSS" />
   <img src="https://img.shields.io/badge/Powered%20by-Vite-646CFF.svg?logo=vite&logoColor=white" alt="Powered by: Vite" />
   <a href="https://www.npmjs.com/~nestjscore">
     <img src="https://img.shields.io/npm/v/@nestjs/core.svg?label=NestJS&color=E0234E&logo=nestjs" alt="NestJS Version" />
@@ -19,39 +20,45 @@ Bidsync es una plataforma de subastas en tiempo real diseñada para ser eficient
 
 ## Arquitectura
 
-El sistema sigue un enfoque de **Monolito Modular** para el backend, construido con NestJS , lo que permite una alta cohesión y bajo acoplamiento entre los dominios de negocio (usuarios, subastas, pujas, etc.)
+El sistema sigue un enfoque de **Monolito Modular** para el backend, construido con NestJS, lo que permite una alta cohesión y bajo acoplamiento entre los dominios de negocio (usuarios, subastas, pujas, etc.)
 
 * `/server`: API de NestJS que maneja toda la lógica de negocio, autenticación y comunicación con la base de datos.
 * `/client`: Aplicación de Página Única (SPA) construida con React que consume la API del servidor.
 
 ## Características Principales
 
- La plataforma implementa un modelo de **Subasta Inglesa** con las siguientes características clave:
+La plataforma implementa un modelo de **Subasta Inglesa** con las siguientes características clave:
 
-*  **Pujas por Poder (Proxy Bidding)**: Los usuarios establecen su puja máxima y el sistema puja automáticamente por ellos.
-*  **Anti-Sniping (Cierre Suave)**: Extiende automáticamente el tiempo de finalización si se recibe una puja en los últimos minutos.
-*  **Precio de Reserva**: Los vendedores pueden establecer un precio mínimo oculto para sus artículos.
-* **¡Cómpralo Ya! (Buy Now) **: Opción para comprar un artículo inmediatamente a un precio fijo, disponible hasta la primera puja.
-* **Flujo de Pagos (Escrow)**: Un sistema de transacciones seguro donde la plataforma retiene el pago hasta que el comprador confirma la recepción.
-*  **Autenticación JWT**: Gestión de usuarios segura mediante JSON Web Tokens.
+* **Experiencia de Usuario Moderna**: Interfaz visual completamente renovada utilizando **Tailwind CSS**, con un diseño limpio y responsivo inspirado en plataformas líderes como Wallapop.
+* **Dashboard de Usuario**: Panel de control centralizado donde los usuarios pueden gestionar:
+    * **Mis Artículos**: Ver y gestionar los productos puestos en subasta.
+    * **Mis Pujas**: Seguimiento de las subastas en las que se está participando.
+    * **Subastas Ganadas**: Gestión de los artículos ganados y su estado de transacción.
+* **Flujo de Transacción**: Sistema completo de estados para artículos ganados (Pendiente de Pago -> Enviado -> Entregado).
+* **Pujas por Poder (Proxy Bidding)**: Los usuarios establecen su puja máxima y el sistema puja automáticamente por ellos.
+* **Anti-Sniping (Cierre Suave)**: Extiende automáticamente el tiempo de finalización si se recibe una puja en los últimos minutos.
+* **Precio de Reserva**: Los vendedores pueden establecer un precio mínimo oculto para sus artículos.
+* **¡Cómpralo Ya! (Buy Now)**: Opción para comprar un artículo inmediatamente a un precio fijo.
+* **Autenticación JWT**: Gestión de usuarios segura mediante JSON Web Tokens.
 
 ## Stack Tecnológico
 
- El stack tecnológico se alinea con las definiciones del proyecto.
+El stack tecnológico se alinea con las definiciones del proyecto.
 
 | Categoría | Tecnología | Justificación |
 | :--- | :--- | :--- |
-| **Backend** |  NestJS (Node.js)  |  Framework TypeScript robusto para una arquitectura modular. |
-| **Frontend** |  React (con TypeScript)  |  UI moderna y tipada. |
-| **Build Tool (FE)** |  Vite  |  Entorno de desarrollo ultrarrápido. |
-| **Base de Datos** |  PostgreSQL  |  Base de datos relacional ACID fiable. |
-| **ORM** |  Prisma  |  ORM con seguridad de tipos end-to-end. |
-| **Autenticación** |  JWT (JSON Web Tokens)  |  Estándar para APIs stateless consumidas por SPAs. |
-| **Tiempo Real** |  WebSockets (vía NestJS Gateways)  |  Esencial para pujas en tiempo real. |
+| **Backend** | NestJS (Node.js) | Framework TypeScript robusto para una arquitectura modular. |
+| **Frontend** | React (con TypeScript) | UI moderna y tipada. |
+| **Estilos** | Tailwind CSS | Framework de utilidad para un diseño rápido y consistente. |
+| **Build Tool (FE)** | Vite | Entorno de desarrollo ultrarrápido. |
+| **Base de Datos** | PostgreSQL | Base de datos relacional ACID fiable. |
+| **ORM** | Prisma | ORM con seguridad de tipos end-to-end. |
+| **Autenticación** | JWT (JSON Web Tokens) | Estándar para APIs stateless consumidas por SPAs. |
+| **Tiempo Real** | WebSockets (vía NestJS Gateways) | Esencial para pujas en tiempo real. |
 
 ## Puesta en Marcha (Desarrollo Local)
 
-Sigue estos pasos para levantar el entorno de desarrollo completo.
+Este proyecto incluye comandos personalizados para facilitar la configuración y ejecución del entorno de desarrollo.
 
 ### 1. Requisitos Previos
 
@@ -59,48 +66,42 @@ Sigue estos pasos para levantar el entorno de desarrollo completo.
 * npm (o pnpm/yarn)
 * Una instancia de PostgreSQL en ejecución.
 
-### 2. Configurar el Servidor (API)
+### 2. Instalación y Configuración
 
-1.  Navega al directorio del servidor:
+1.  **Instalar todas las dependencias**:
+    Ejecuta el siguiente comando en la raíz del proyecto para instalar las dependencias de la raíz, del cliente y del servidor automáticamente:
     ```bash
-    cd server
+    npm run install:all
     ```
-2.  Instala las dependencias:
-    ```bash
-    npm install
-    ```
-3.  Crea tu archivo de entorno a partir del ejemplo:
-    ```bash
-    cp .env.example .env
-    ```
-4.  Edita el archivo `.env` y configura tus variables:
-    * `DATABASE_URL`: La cadena de conexión a tu base de datos PostgreSQL. (Ej: `"postgresql://user:password@localhost:5432/bidsync?schema=public"`)
-    * `JWT_SECRET`: Una cadena aleatoria segura para firmar los tokens.
-5.  Aplica las migraciones de la base de datos (esto creará las tablas):
-    ```bash
-    npx prisma migrate dev
-    ```
-6.  Inicia el servidor en modo *watch*:
-    ```bash
-    npm run start:dev
-    ```
-    La API estará disponible en `http://localhost:3000` (o el puerto definido en `.env`).
 
-### 3. Configurar el Cliente (React App)
+2.  **Configurar el Servidor (Base de Datos)**:
+    *   Navega a la carpeta del servidor: `cd server`
+    *   Crea tu archivo `.env`: `cp .env.example .env`
+    *   Edita `.env` con tus credenciales de base de datos (`DATABASE_URL`) y `JWT_SECRET`.
+    *   Ejecuta las migraciones:
+        ```bash
+        npx prisma migrate dev
+        ```
+    *   Vuelve a la raíz: `cd ..`
 
-1.  Abre una **nueva terminal** y navega al directorio del cliente:
-    ```bash
-    cd client
-    ```
-2.  Instala las dependencias:
-    ```bash
-    npm install
-    ```
-3.  Inicia el servidor de desarrollo de Vite:
-    ```bash
-    npm run dev
-    ```
-    La aplicación web estará disponible en `http://localhost:5173`.
+### 3. Ejecutar la Aplicación
+
+Para iniciar el entorno de desarrollo completo (Cliente + Servidor) con un solo comando:
+
+```bash
+npm run dev
+```
+
+Este comando utiliza `concurrently` para levantar simultáneamente:
+*   **Backend (API)**: `http://localhost:3000`
+*   **Frontend (Web)**: `http://localhost:5173`
+
+### Comandos Útiles
+
+*   `npm run install:all`: Instala dependencias en raíz, cliente y servidor.
+*   `npm run dev`: Inicia cliente y servidor en modo desarrollo.
+*   `npm run build`: Construye cliente y servidor para producción.
+*   `npm run lint`: Ejecuta el linter en ambos proyectos.
 
 ## Contribuciones
 
