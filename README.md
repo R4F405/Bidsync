@@ -25,6 +25,34 @@ El sistema sigue un enfoque de **Monolito Modular** para el backend, construido 
 * `/server`: API de NestJS que maneja toda la lógica de negocio, autenticación y comunicación con la base de datos.
 * `/client`: Aplicación de Página Única (SPA) construida con React que consume la API del servidor.
 
+## Estructura del Proyecto
+
+El proyecto está organizado en dos directorios principales dentro de un monorepo:
+
+### 📂 client (Frontend)
+La aplicación React está estructurada de la siguiente manera en `src/`:
+
+*   `assets`: Recursos estáticos como imágenes y estilos globales.
+*   `components`: Componentes de UI reutilizables (Navbar, Cards, Modales).
+*   `context`: Contextos de React para gestión de estado global (ej. AuthContext).
+*   `hooks`: Hooks personalizados para lógica compartida.
+*   `pages`: Componentes de página que representan las vistas principales (Home, Dashboard, Login).
+*   `router`: Configuración de rutas de la aplicación.
+*   `services`: Módulos para la comunicación con la API del backend.
+*   `types`: Definiciones de tipos TypeScript compartidos.
+
+### 📂 server (Backend)
+La API NestJS sigue una arquitectura modular en `src/`:
+
+*   `auctions`: Módulo de gestión de subastas.
+*   `auth`: Módulo de autenticación y guardias JWT.
+*   `bids`: Lógica para la gestión de pujas.
+*   `events`: Gateway de WebSockets para eventos en tiempo real.
+*   `items`: Gestión de artículos e inventario.
+*   `prisma`: Servicio de conexión con la base de datos y ORM.
+*   `transactions`: Gestión del flujo de pagos y estados de envío.
+*   `users`: Gestión de perfiles de usuario y datos relacionados.
+
 ## Características Principales
 
 La plataforma implementa un modelo de **Subasta Inglesa** con las siguientes características clave:
